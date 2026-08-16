@@ -47,3 +47,4 @@ override.tf.json
 .env
 .env.*
 *.tfvars.save
+/bootstrap/backend.tf

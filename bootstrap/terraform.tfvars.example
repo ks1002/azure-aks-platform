@@ -1,0 +1,14 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+
+location       = "northeurope"
+location_short = "ne"
+
+project_name = "aksplatform"
+environment  = "dev"
+
+tags = {
+  Environment = "dev"
+  ManagedBy   = "Terraform"
+  Project     = "AKSPlatform"
+  Owner       = "your-name"
+}
