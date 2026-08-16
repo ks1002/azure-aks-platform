@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: keyvault-test
+  namespace: app
+
+  labels:
+    azure.workload.identity/use: "true"
+
+spec:
+  serviceAccountName: kv-reader
+
+  containers:
+    - name: busybox
+
+      image: registry.k8s.io/e2e-test-images/busybox:1.29-4
+
+      command:
+        - "/bin/sleep"
+        - "3600"
+
+      volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+
+  volumes:
+    - name: secrets-store
+
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+
+        volumeAttributes:
+          secretProviderClass: "aksplatform-keyvault"

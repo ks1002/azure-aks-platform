@@ -1,0 +1,49 @@
+# Terraform working directory
+**/.terraform/*
+
+# Terraform state
+*.tfstate
+*.tfstate.*
+errored.tfstate
+
+# Terraform plans
+*.tfplan
+
+# Variable files containing environment-specific values
+terraform.tfvars
+*.auto.tfvars
+
+# Local backend configuration
+backend.hcl
+
+# Crash files
+crash.log
+crash.*.log
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary Kubernetes files with real IDs
+serviceaccount.local.yaml
+secretproviderclass.local.yaml
+
+# Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Environment files
+.env
+.env.*
+*.tfvars.save

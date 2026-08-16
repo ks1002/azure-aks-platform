@@ -1,0 +1,22 @@
+zsubscription_id = "00000000-0000-0000-0000-000000000000"
+
+location       = "northeurope"
+location_short = "ne"
+
+project_name = "aksplatform"
+environment  = "dev"
+
+app_vnet_address_space        = ["10.10.0.0/16"]
+management_vnet_address_space = ["10.20.0.0/16"]
+
+firewall_subnet_address_prefixes         = ["10.10.1.0/26"]
+aks_subnet_address_prefixes              = ["10.10.2.0/23"]
+private_endpoint_subnet_address_prefixes = ["10.10.4.0/24"]
+management_subnet_address_prefixes       = ["10.20.1.0/24"]
+
+tags = {
+  Environment = "dev"
+  ManagedBy   = "Terraform"
+  Project     = "AKSPlatform"
+  Owner       = "your-name"
+}

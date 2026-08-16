@@ -1,0 +1,25 @@
+terraform {
+  backend "azurerm" {
+    storage_account_name = "youruniquestorageaccount"
+    container_name       = "tfstate"
+    key                  = "bootstrap.tfstate"
+
+    use_azuread_auth = true
+    use_cli          = true
+  }
+}
+
+# Optional remote backend configuration.
+#
+# Run the bootstrap configuration with local state first.
+# After the Azure Storage Account and tfstate container exist,
+# configure an azurerm backend and migrate the bootstrap state.
+
+bootstrap/
+    ↓
+local Terraform state initially
+    ↓
+create tfstate RG + Storage Account + container
+    ↓
+DEV uses Azure remote backend
+
