@@ -15,11 +15,11 @@ terraform {
 # After the Azure Storage Account and tfstate container exist,
 # configure an azurerm backend and migrate the bootstrap state.
 
-bootstrap/
-    ↓
-local Terraform state initially
-    ↓
-create tfstate RG + Storage Account + container
-    ↓
-DEV uses Azure remote backend
+#bootstrap/
+#    ↓
+#local Terraform state initially
+#    ↓
+#create tfstate RG + Storage Account + container
+#    ↓
+#DEV uses Azure remote backend
 
