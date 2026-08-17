@@ -5,13 +5,17 @@ Azure Kubernetes Service (AKS), Docker and Kubernetes.
 
 The purpose of this project was to build an Azure AKS platform from
 scratch and understand the infrastructure, networking, identity,
-security and application deployment flow.
+security and application deployment flow and The focus was on understanding how the different Azure and Kubernetes components fit together, especially networking, container image access and secret management.
+
+The lab was created in my personal Azure subscription and the infrastructure was destroyed after testing so that I was not leaving resources running unnecessarily.
+
+
 
 ## Architecture
 
 The platform contains:
 
-- Azure Resource Groups
+- Azure Resource Groups (Separate Application and Management resource groups)
 - Application and Management VNets
 - Dedicated subnets
 - Network Security Groups
@@ -27,14 +31,74 @@ The platform contains:
 - Kubernetes ClusterIP Service
 - Containerized Python backend
 
+## Architecture
+
+                         Azure Subscription
+                                |
+             +------------------+------------------+
+             |                                     |
+     Application Resource Group            Management Resource Group
+             |                                     |
+      Application VNet                         Management VNet
+             |                                     |
+      +------+-------+                         Log Analytics
+      |              |
+   AKS subnet   Private Endpoint subnet
+      |
+      v
+     AKS
+      |
+      +--------------------------+
+      |                          |
+      v                          v
+     ACR                     Key Vault
+ backend:v1                     ^
+      |                          |
+      |                 Workload Identity
+      |                  + OIDC Federation
+      |                          |
+      +----------> Backend Pod --+
+                       |
+                       v
+                ClusterIP Service
+
+The current lab keeps the backend internal through a ClusterIP Service. External application routing is intentionally left for the next phase.
+
+
 ## Infrastructure as Code
 
 Terraform is used to provision the Azure infrastructure.
 
 The project is divided into:
 
-- `bootstrap/` - Terraform state storage infrastructure
-- `environment/dev/` - Development Azure environment
+-bootstrap/ - creates the storage required for remote Terraform state
+
+-environment/dev/ - creates the development Azure environment
+
+Terraform manages the Azure resources while Kubernetes manifests manage the application resources inside AKS.
+
+This separation was intentional:
+
+Terraform
+   |
+   +--> Resource Groups
+   +--> VNets / Subnets / NSGs
+   +--> AKS
+   +--> ACR
+   +--> Key Vault
+   +--> Log Analytics
+   +--> Managed Identities
+   +--> Azure RBAC
+
+Kubernetes YAML
+   |
+   +--> Namespace
+   +--> ServiceAccount
+   +--> SecretProviderClass
+   +--> Deployment
+   +--> Service
+
+
 
 ## Application
 
@@ -89,13 +153,58 @@ The backend uses:
 
 ## Project Structure
 
-```text
 azure-aks-platform/
 ├── application/
 │   └── backend/
+│       ├── app.py
+│       ├── Dockerfile
+│       ├── requirements.txt
+│       └── .dockerignore
+│
 ├── bootstrap/
+│   ├── backend.tf.example
+│   ├── terraform.tfvars.example
+│   └── ...
+│
 ├── environment/
 │   └── dev/
+│       ├── acr.tf
+│       ├── aks.tf
+│       ├── identity.tf
+│       ├── key-vault.tf
+│       ├── log-analytics.tf
+│       ├── network.tf
+│       ├── nsg.tf
+│       ├── peering.tf
+│       ├── resource-groups.tf
+│       ├── backend.tf
+│       ├── backend.hcl.example
+│       ├── terraform.tfvars.example
+│       └── ...
+│
 └── kubernetes/
     ├── backend/
+    │   ├── deployment.yaml
+    │   └── service.yaml
+    │
     └── workload-identity/
+        ├── namespace.yaml
+        ├── serviceaccount.yaml
+        ├── secretproviderclass.yaml
+        └── test-pod.yaml
+
+
+## Destroying the lab
+
+The lab is designed to be temporary.
+
+Destroy the development environment first:
+
+cd environment/dev
+
+terraform plan -destroy
+terraform destroy
+
+The bootstrap/state-storage layer should be handled separately after the development environment is removed.
+
+
